@@ -1,0 +1,15 @@
+flag = HTB{Well_done_finally}
+iv = zxcvbnmlkjhgfdsa
+key = qwertyuiopasdfgh
+
+encrypted = 7a786376626e6d6c6b6a686766647361711680b1aa3ac967f3fc08df5ef1dcfcf0eb73cd073026a8f4fa30582e749e0d
+
+
+hexIV = 7a786376626e6d6c6b6a686766647361
+
+C1 = 711680b1aa3ac967f3fc08df5ef1dcfc
+C2 = f0eb73cd073026a8f4fa30582e749e0d
+
+C1'= 711680b1aa3ac967f3fc08df5ef1dc00
+
+IV+C1'+C2 = zxcvbnmlkjhgfdsa711680b1aa3ac967f3fc08df5ef1dc00f0eb73cd073026a8f4fa30582e749e0d

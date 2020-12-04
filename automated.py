@@ -1,6 +1,9 @@
 """This script, when finished, will fully (and efficiently) crack all but 
 the first block of the ciphertext. It utilises the algorithms created in the poc."""
+from pwn import *
 import server   # To negate the need for socket programming currently
+host = "127.0.0.1"
+port = 23333
 flag = []   # plaintext answer
 count = 16  # Bytes in block 1
 xor = 1    # Starting value to xor with
@@ -16,31 +19,41 @@ cLoco2 = 64
 cPointer1 = 0
 cPointer2 = 2
 
-cipher = "7a786376626e6d6c6b6a686766647361cb20bbc7e34c16603060427d7c77ca31bd5c9b3024d82c1a85ee58ef256975db"  # Cipher text recieved from Oracle
+"""cipher = "7a786376626e6d6c6b6a686766647361cb20bbc7e34c16603060427d7c77ca31bd5c9b3024d82c1a85ee58ef256975db"  # Cipher text recieved from Oracle
 iv  =    "7a786376626e6d6c6b6a686766647361"    # Initialisation vector
 oc1 = "cb20bbc7e34c16603060427d7c77ca31"    # Block 1
-oc2 = "bd5c9b3024d82c1a85ee58ef256975db"    # Block 2
+oc2 = "bd5c9b3024d82c1a85ee58ef256975db"    # Block 2"""
 primes = []
 valid = []
 tail=[]
 hexvals = []
 
-blockTarget = 2
-
 for i in range(255):    hexvals.append(i)    # generate all hex values
 
 
 if __name__ == "__main__":
-
+    p = remote(host,port)
+    print(p.recvuntil(b'2. Send your encrypted message.\n'))
+    p.sendline(b"1")
+    cipher = (p.recvline()).decode("utf-8")
+    print("Beginning Attack...")
     c = [cipher[i:i+32] for i in range(0, len(cipher), 32)]
+    iv = c[0]
+    oc1 = c[1]
+    oc2 = c[2]
     for i in hexvals:
-        #prime = iv+c1[:-4]+bytes([i]).hex()+''.join(tail)+oc2
+        p.recvuntil(b'2. Send your encrypted message.\n')
+        p.sendline(b"2")
+        p.recvline()
         prime = iv+oc1[:-endCut]+bytes([i]).hex()+''.join(tail)+oc2
-        result = server.is_padding_ok(bytes.fromhex(prime))
+        p.sendline(prime.encode())
+        #result = server.is_padding_ok(bytes.fromhex(prime))
+        result = p.recvline()
+        result = result.decode("utf-8")
         if "Invalid" in result:
             pass
         else:
-            if prime != cipher:  # Save new valid pad
+            if prime.strip() != cipher.strip():  # Save new valid pad
                 current = prime
     c1 = current[32:64]
     """Some cryptography voodoo for calculating paintext."""
@@ -67,8 +80,14 @@ if __name__ == "__main__":
     while count > 1:
 
         for i in hexvals:
+            p.recvuntil(b'2. Send your encrypted message.\n')
+            p.sendline(b"2")
+            p.recvline()
             prime = iv+c1[:-endCut]+bytes([i]).hex()+''.join(tail)+oc2
-            result = server.is_padding_ok(bytes.fromhex(prime))
+            #result = server.is_padding_ok(bytes.fromhex(prime))
+            p.sendline(prime.encode())
+            result = p.recvline()
+            result = result.decode("utf-8")
             if "Invalid" in result:
                 pass
             else:

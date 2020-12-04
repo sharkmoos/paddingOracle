@@ -13,3 +13,35 @@ C2 = f0eb73cd073026a8f4fa30582e749e0d
 C1'= 711680b1aa3ac967f3fc08df5ef1dc00
 
 IV+C1'+C2 = zxcvbnmlkjhgfdsa711680b1aa3ac967f3fc08df5ef1dc00f0eb73cd073026a8f4fa30582e749e0d
+CRAFTED
+7a786376626e6d6c6b6a686766647361
+711680b1aa3ac967f3fc08df5ef1dcf3
+f0eb73cd073026a8f4fa30582e749e0d
+
+REAL
+7a786376626e6d6c6b6a686766647361
+711680b1aa3ac967f3fc08df5ef1dcfc
+f0eb73cd073026a8f4fa30582e749e0d
+
+====================================================
+C1..14 = Random : C15  target : C 16 = 02 ^ 242
+C1' = 711680b1aa3ac967f3fc08df5ef100f0
+C2 = f0eb73cd073026a8f4fa30582e749e0d
+------------------------------------------
+
+7a786376626e6d6c6b6a686766647361
+711680b1aa3ac967f3fc08df5ef1d0f0
+f0eb73cd073026a8f4fa30582e749e0d
+
+=======================================================================
+C1..13 = Random : C 14 = Target C15 = 03 ^ 210 = D1
+
+
+7a786376626e6d6c6b6a686766647361
+711680b1aa3ac967f3fc08df5efcd1f1
+f0eb73cd073026a8f4fa30582e749e0d
+
+
+
+
+

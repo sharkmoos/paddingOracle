@@ -1,3 +1,3 @@
 def flag():
-    flag = b"HTB{Well_done_you}"
+    flag = "HTB{Well_done_you}"
     return(flag)

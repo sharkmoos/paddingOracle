@@ -4,13 +4,16 @@ import signal
 import os
 import random
 import time
-from secret import flag
-
+#from secret import flag
+flag = b"Good job. the flag is HTB{Well_done_you}"
+# Encryted flag 7a786376626e6d6c6b6a686766647361711680b1aa3ac967f3fc08df5ef1dcfcf0eb73cd073026a8f4fa30582e749e0d
 KEY_LENGTH = 16
 BLOCK_SIZE = AES.block_size
 
-key = os.urandom(KEY_LENGTH)
+#key = os.urandom(KEY_LENGTH)
 
+key = b"qwertyuiopasdfgh" # New key for testing
+iv  = b"zxcvbnmlkjhgfdsa" # New IV for testing
 def add_padding(msg):
 	pad_len = BLOCK_SIZE - (len(msg) % BLOCK_SIZE)
 	padding = bytes([pad_len]) * pad_len
@@ -26,7 +29,8 @@ def remove_padding(data):
 	return data[:-pad_len]
 
 def encrypt(msg):
-	iv = os.urandom(BLOCK_SIZE)
+	#iv = os.urandom(BLOCK_SIZE)
+	print(iv.hex)
 	cipher = AES.new(key, AES.MODE_CBC, iv)
 	return (iv + cipher.encrypt(add_padding(msg))).hex()
 
@@ -36,6 +40,7 @@ def decrypt(data):
 
 	cipher = AES.new(key, AES.MODE_CBC, iv)
 	return remove_padding(cipher.decrypt(data[BLOCK_SIZE:]))
+
 
 def is_padding_ok(data):
 	if decrypt(data) is not None:
@@ -82,6 +87,9 @@ class incoming(socketserver.BaseRequestHandler):
 class ReusableTCPServer(socketserver.ForkingMixIn, socketserver.TCPServer):
 	pass
 
-socketserver.TCPServer.allow_reuse_address = True
-server = ReusableTCPServer(("0.0.0.0", 23333), incoming)
-server.serve_forever()
+if __name__ == '__main__':
+
+
+	socketserver.TCPServer.allow_reuse_address = True
+	server = ReusableTCPServer(("0.0.0.0", 23333), incoming)
+	server.serve_forever()

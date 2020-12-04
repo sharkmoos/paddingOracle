@@ -7,7 +7,7 @@ This project contains various files.
 This file contains the "Oracle" that will be exploited. The "attacker" would not nessessarily need this source code in order to exploit the Oracle, however it is useful in order to confirm that AES CBC encryption is being used.
 
 ### poc.py
-The poc file is essentially a typed out way of how the attack can be exploited by hand, with no code efficiency. This was written whilst learning/testing the attack and so it is sparadic and illogical. However, it can be useful to read in order to visualise how the attack works.
+The poc file is essentially a typed out way of how the attack can be exploited by hand, with no code efficiency. This was written whilst learning/testing the attack and so it is sparadic and illogical. However, it can be useful to read in order to visualise how the attack works. It also doesn't use the remote server, it actually imports the server.py file in order to 1. Speed up the process whilst testing and 2. Access the functions directly, rather than interacting with the menu system.
 
 ### automated.py
 

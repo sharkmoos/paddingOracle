@@ -5,8 +5,8 @@ import os
 import random
 import time
 #from secret import flag
-flag = b"Good job. the flag is HTB{Well_done_you}"
-# Encryted flag 7a786376626e6d6c6b6a686766647361711680b1aa3ac967f3fc08df5ef1dcfcf0eb73cd073026a8f4fa30582e749e0d
+flag = b"The flag is HTB{Well_done_you}"
+# Encryted flag 
 KEY_LENGTH = 16
 BLOCK_SIZE = AES.block_size
 

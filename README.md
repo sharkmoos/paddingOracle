@@ -5,7 +5,7 @@
 
 Simply put, the padding oracle attack (or oracle padding attack) is an attack on the way in which CBC works. CBC (cipher block chaining) is a mode of operation used by some block ciphers, and was created in 1976. In CBC mode, each block of plaintext for XORed with the previous block of cipher text before being encrypted. The first block is XORed with an IV (initialization vector).
 
-![CBC Mode][/images/cbc2.png]
+![CBC Mode](/images/cbc2.png)
 Diagram of how CBC encryption functions.
 
 There are numerous types of padding Oracle attack, however this project focusses on the AES CBC encryption.
@@ -14,13 +14,13 @@ The requirements for a padding oracle attack are simple. The attacker must have 
 
 ## What is a pad?
 
-In block ciphers, the ciphertext **must** be a multiple of the block size. In AES the block size is 16 bytes, and so the ciphertext will always be a multiple of 16. However, what are the chances of someone's plaintext being exactly 16 bytes? Pretty slim. As a way to resolve this, the cipher adds **padding**. This is essentialls extra bytes added onto the plaintext before it is encrypted in order to make it equal 16 bytes. If your plaintext is 10 bytes, there will be 6 bytes of padding; 8 bytes will have 8 bytes of padding and so on. Additionally, the standard for adding padding is to pad each byte with the representation of the number of bytes to be padded. If we go back to our example, a 6 byte pad would be padded with *06 06 06 06 06 06*. A 3 byte pad would be *03 03 03*. This tell us something about the ciphertext, and such a block ending with *06 02 08* is **not** valid. This is not in itself vulnerable, due to the CBC mode the padding would not result in a pre image attack (read about that [here][https://en.wikipedia.org/wiki/Preimage_attack], but it will become important later.
+In block ciphers, the ciphertext **must** be a multiple of the block size. In AES the block size is 16 bytes, and so the ciphertext will always be a multiple of 16. However, what are the chances of someone's plaintext being exactly 16 bytes? Pretty slim. As a way to resolve this, the cipher adds **padding**. This is essentialls extra bytes added onto the plaintext before it is encrypted in order to make it equal 16 bytes. If your plaintext is 10 bytes, there will be 6 bytes of padding; 8 bytes will have 8 bytes of padding and so on. Additionally, the standard for adding padding is to pad each byte with the representation of the number of bytes to be padded. If we go back to our example, a 6 byte pad would be padded with *06 06 06 06 06 06*. A 3 byte pad would be *03 03 03*. This tell us something about the ciphertext, and such a block ending with *06 02 08* is **not** valid. This is not in itself vulnerable, due to the CBC mode the padding would not result in a pre image attack (read about that [here](https://en.wikipedia.org/wiki/Preimage_attack), but it will become important later.
 
 # Attacking the Oracle
 
 So, how is this seemingly small error exploited? Maths - Lots of maths, but essentially all an attacker needs to break CBC is to know whether or not a generated cipher text created plaintext with valid padding. (In the working example that will be used, it is very clear whether a ciphertext is valid, but even an API returning 200 for valid padding and 500 if not is enough).
 
-![CBC Mode][/images/cbc.png]
+![CBC Mode](/images/cbc.png)
 (Refer to the diagram again for a visual understanding)
 
 The attack works by calculating the intermediate state of the decryption for each cipher block. This is the point at which the ciphertext has been decryypted but **not** XORed with the previous cipher block. This attack functions by working *up* from the plaintext rather than *down* from the ciphertext. We can write algorithms for why the intermediate state is useful. For the purpose of the explination we will be attacking a 3 block ciphertext (IV + C1 + C2). So to attack C2 we can use C1.

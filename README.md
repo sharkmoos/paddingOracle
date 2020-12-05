@@ -84,14 +84,13 @@ So we know that the last byte of our plaintext is 02 - this also suggests that t
 
 ## Repeat the process.
 
-So, renewed with vigor now that one byte has been cracked, we push onto the next. So in the previous example we decided P2[16] should equal 01, (1 bit of padding) this time we will manipulate 2 bits, and so each byte of padding should equal 02. This time C1'[1..14] can be random, C1'[15] == 0, and C1'[16] should be made so that P2'[16] == 2. So lets calculate what C'1[16] should be.
+So, renewed with vigor now that one byte has been cracked, we push onto the next. So in the previous example we decided P2'[16] should equal 01, (1 bit of padding) this time we will manipulate 2 bits, and so each byte of padding should equal 02. This time C1'[1..14] can be random, C1'[15] == 0, and C1'[16] should be made so that P2'[16] == 2. So lets calculate what C'1[16] should be.
 
     C1'[16] = P2'[16] ^ I2[16]
             = 02      ^ 0x33
             = 0x31    # hex  
-            = 49      # decimal
 
-To recap, the last two bytes of P2' we are trying to now find should == 02 02. Now repeat the process, changin C1'[15] to be 00,01,02 etc until valid cipher text is found. Once it is found, we can get the plaintext for P2[15] the same way as before. In our working example, D0 (208 in base 10) was valid and so we pipe this into the formula.
+To recap, the last two bytes of P2' we are trying to now find should == 02 02. Now repeat the process, changing C1'[15] to be 00,01,02 etc until valid cipher text is found. Once it is found, we can get the plaintext for P2[15] the same way as before. In our working example, D0 (208 in base 10) was valid and so we pipe this into the formula.
 
     I2[15] = C1'[15] ^ P2'[15] 
            = 0xCA    ^ 02
@@ -104,7 +103,7 @@ and then
     P2[15] = 0x2  # hex
            = 2 # decimal
 
-Whilst this may seem a little underwhelming whe you see the trend, it is also useful. Yes - we had to crack 2 bytes without getting **any** plaintext that isn't just padding, but it is also a great sanity check that the process is working. (Again highlights the need for heavy automation). 
+Whilst this may seem a little underwhelming whe you see the trend, it is also useful. Yes - we had to crack 2 bytes without getting **any** plaintext that isn't just padding, and it is highly likely to be upwards of 7 bytes of padding before real plaintext message starts being cracked;but it is also a great sanity check that the process is working. (Again highlights the need for heavy automation). 
 
 ## Rinse and repeat
 
@@ -112,4 +111,4 @@ This process can be repeated 16 times as this is the number of bytes in block C2
 
 I wrote a program to automate this entire process which you can find [here][https://github.com/sharkmoos/paddingOracle/blob/main/automated.py]. It uses connects to the server via a socket and interacts fully. It should be easy to rework too depending on the task.
 
-This is a good demonstration of why security through obscurity - if the attacker couldn't test whether padding was valid, this attack would fail before it began. I hope you enjoyed reading this article, or failing that found it useful. 
+This is a good demonstration of why security through obscurity is effective - if the attacker couldn't test whether padding was valid, this attack would fail before it began. I hope you enjoyed reading this article, or failing that found it useful. 

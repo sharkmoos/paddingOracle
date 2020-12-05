@@ -6,6 +6,7 @@
 Simply put, the padding oracle attack (or oracle padding attack) is an attack on the way in which CBC works. CBC (cipher block chaining) is a mode of operation used by some block ciphers, and was created in 1976. In CBC mode, each block of plaintext for XORed with the previous block of cipher text before being encrypted. The first block is XORed with an IV (initialization vector).
 
 ![CBC Mode](/images/cbc2.png)
+
 Diagram of how CBC encryption functions.
 
 There are numerous types of padding Oracle attack, however this project focusses on the AES CBC encryption.
@@ -21,6 +22,7 @@ In block ciphers, the ciphertext **must** be a multiple of the block size. In AE
 So, how is this seemingly small error exploited? Maths - Lots of maths, but essentially all an attacker needs to break CBC is to know whether or not a generated cipher text created plaintext with valid padding. (In the working example that will be used, it is very clear whether a ciphertext is valid, but even an API returning 200 for valid padding and 500 if not is enough).
 
 ![CBC Mode](/images/cbc.png)
+
 (Refer to the diagram again for a visual understanding)
 
 The attack works by calculating the intermediate state of the decryption for each cipher block. This is the point at which the ciphertext has been decryypted but **not** XORed with the previous cipher block. This attack functions by working *up* from the plaintext rather than *down* from the ciphertext. We can write algorithms for why the intermediate state is useful. For the purpose of the explination we will be attacking a 3 block ciphertext (IV + C1 + C2). So to attack C2 we can use C1.

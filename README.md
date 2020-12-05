@@ -11,37 +11,35 @@ Diagram of how CBC encryption functions.
 
 There are numerous types of padding Oracle attack, however this project focusses on the AES CBC encryption.
 
-The requirements for a padding oracle attack are simple. The attacker must have access to an Oracle (a server) which freely responds to incoming messages, and will confirm whether or not a message is correctly padded. This in itself tells the attacker something, additionally, the nature of CBC means that an attacker can expose the details of block n, by manipulating block n-1. The second requirement is having a ciphertext produced **by the oracle being attacked**.
+The requirements for a padding oracle attack are simple. The attacker must have access to an Oracle (a server) which freely responds to incoming messages, and will confirm whether or not a message is correctly padded. This in itself tells the attacker something. Additionally, the nature of CBC means that an attacker can expose the details of block n, by manipulating block n-1. The second requirement is having a ciphertext produced **by the oracle being attacked**.
 
 ## What is a pad?
 
-In block ciphers, the ciphertext **must** be a multiple of the block size. In AES the block size is 16 bytes, and so the ciphertext will always be a multiple of 16. However, what are the chances of someone's plaintext being exactly 16 bytes? Pretty slim. As a way to resolve this, the cipher adds **padding**. This is essentialls extra bytes added onto the plaintext before it is encrypted in order to make it equal 16 bytes. If your plaintext is 10 bytes, there will be 6 bytes of padding; 8 bytes will have 8 bytes of padding and so on. Additionally, the standard for adding padding is to pad each byte with the representation of the number of bytes to be padded. If we go back to our example, a 6 byte pad would be padded with *06 06 06 06 06 06*. A 3 byte pad would be *03 03 03*. This tell us something about the ciphertext, and such a block ending with *06 02 08* is **not** valid. This is not in itself vulnerable, due to the CBC mode the padding would not result in a pre image attack (read about that [here](https://en.wikipedia.org/wiki/Preimage_attack), but it will become important later.
+In block ciphers, the ciphertext **must** be a multiple of the block size. In AES the block size is 16 bytes, and so the ciphertext will always be a multiple of 16. However, what are the chances of someone's plaintext being exactly 16 bytes? Pretty slim. As a way to resolve this, the cipher adds **padding**. This is essentially extra bytes added onto the plaintext before it is encrypted in order to make it equal 16 bytes. If your plaintext is 10 bytes, there will be 6 bytes of padding; 8 bytes will have 8 bytes of padding and so on. Additionally, the standard for adding padding is to pad each byte with the representation of the number of bytes to be padded. If we go back to our example, a 6 byte pad would be padded with *06 06 06 06 06 06*. A 3 byte pad would be *03 03 03*. This tell us something about the ciphertext, and such a block ending with *06 02 08* is **not** valid. This is not in itself vulnerable, due to the CBC mode the padding would not result in a pre image attack (read about that [here](https://en.wikipedia.org/wiki/Preimage_attack)), but it will become important later.
 
 # Attacking the Oracle
 
-So, how is this seemingly small error exploited? Maths - Lots of maths, but essentially all an attacker needs to break CBC is to know whether or not a generated cipher text created plaintext with valid padding. (In the working example that will be used, it is very clear whether a ciphertext is valid, but even an API returning 200 for valid padding and 500 if not is enough).
+So, how is this seemingly small error exploited? Maths - Lots of maths, but fundamentally all an attacker needs to break CBC is to know whether or not a generated cipher text created plaintext with valid padding. (In the working example that will be used it is very clear whether a ciphertext is valid, but even an API returning 200 for valid padding and 500 if not is enough).
 
 ![CBC Mode](/images/cbc.png)
 
 (Refer to the diagram again for a visual understanding)
 
-The attack works by calculating the intermediate state of the decryption for each cipher block. This is the point at which the ciphertext has been decryypted but **not** XORed with the previous cipher block. This attack functions by working *up* from the plaintext rather than *down* from the ciphertext. We can write algorithms for why the intermediate state is useful. For the purpose of the explination we will be attacking a 3 block ciphertext (IV + C1 + C2). So to attack C2 we can use C1.
+The attack works by calculating the intermediate state of the decryption for each cipher block. This is the point at which the ciphertext has been decrypted but **not** XORed with the previous cipher block. This attack functions by working *up* from the plaintext rather than *down* from the ciphertext. We can write algorithms for why the intermediate state is useful. For the purpose of the explanation we will be attacking a 3 block ciphertext (IV + C1 + C2). So to attack C2 we can use C1.
 
-*I2* : Intermediate state of block 2
-
-*C1* : Cipher block 1
-
-*P2* : Plaintext block 2
+    *I2* : Intermediate state of block 2
+    *C1* : Cipher block 1
+    *P2* : Plaintext block 2
 
 ^    : XOR function (It is important to remember XOR is bidirectional)
 
     I2 = C1 ^ P2
 
-and therefor
+and therefore
 
     P2 = C1 ^ I2
 
-So, if we have a some ciphertext from block 1 and some intermediary text from block 2, we can XOR them to get valid block 2 plaintext. C1 is already known to us, it is just part of the 'stolen' ciphertext. Therefor, if we can calculate I2 then we will be able to calculate P2. Now, this attack works *up* - so rather than trying to calculate what I2 is we can use our knowledge of padding to force what I2 will be. So how do we do this? Lets say our ciphertext is
+So, if we have a some ciphertext from block 1 and some intermediary text from block 2, we can XOR them to get valid block 2 plaintext. C1 is already known to us, it is just part of the 'stolen' ciphertext. Therefore, if we can calculate I2 then we will be able to calculate P2. Now, this attack works *up* - so rather than trying to calculate what I2 is we can use our knowledge of padding to force what I2 will be. So how do we do this? Lets say our ciphertext is
 
     7a786376626e6d6c6b6a686766647361cb20bbc7e34c16603060427d7c77ca31bd5c9b3024d82c1a85ee58ef256975db
 
@@ -64,7 +62,7 @@ then
     I1     = 00     ^ 01   
     I2     = 01 
 
-If the Oracle tells us our ciphertext is invalid we can change the value of C1'[16] to 01, 02 etc until we get valid ciphertext. In the poc code on [GitHub][https://github.com/sharkmoos/paddingOracle/] we got valid padding for 33 (hex). So lets put that into our formula!
+If the Oracle tells us our ciphertext is invalid we can change the value of C1'[16] to 01, 02 etc until we get valid ciphertext. In the poc code on [GitHub](https://github.com/sharkmoos/paddingOracle/) we got valid padding for 33 (hex). So lets put that into our formula!
 
     I2     = 0x51     ^ 01
     I2     = 0x33

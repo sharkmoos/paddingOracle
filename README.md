@@ -80,7 +80,7 @@ So we now know the final byte of the intermediate state when the plaintext is ha
            = 0x2  # hex
            = 2    # decimal
 
-So we know that the last byte of our plaintext is 14 - this also suggests that the padding length is 14. If you've been following along doing it with your own code or Oracle, you probably felt like this was a lot of work. This highlights the need for automation.
+So we know that the last byte of our plaintext is 02 - this also suggests that the padding length is 02. If you've been following along doing it with your own code or Oracle, you probably felt like this was a lot of work. This highlights the need for automation.
 
 ## Repeat the process.
 

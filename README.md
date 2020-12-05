@@ -3,7 +3,7 @@
 
 # Inroducing the Padding Oracle Attack
 
-Simply put, the padding oracle attack (or oracle padding attack) is an attack on the way in which CBC works. CBC (cipher block chaining) is a mode of operation used by some block ciphers, and was created in 1976. In CBC mode, each block of plaintext is XORed with the previous block of cipher text after being encrypted. The first block is XORed with an IV (initialization vector).
+Simply put, the padding oracle attack (or oracle padding attack) is an attack on the way in which CBC works. CBC (cipher block chaining) is a mode of operation used by some block ciphers, and was created in 1976. In CBC mode, each block of plaintext is XORed with the previous block of cipher text before being encrypted. The first block is XORed with an IV (initialization vector).
 
 ![CBC Mode](/images/cbc2.png)
 

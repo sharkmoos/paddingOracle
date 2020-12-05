@@ -1,7 +1,7 @@
 # Exploiting the Padding Oracle Attack
 #### By Ben Roxbee Cox
 
-# Inroducing the Padding Oracle Attack
+# Introducing the Padding Oracle Attack
 
 Simply put, the padding oracle attack (or oracle padding attack) is an attack on the way in which CBC works. CBC (cipher block chaining) is a mode of operation used by some block ciphers, and was created in 1976. In CBC mode, each block of plaintext is XORed with the previous block of cipher text before being encrypted. The first block is XORed with an IV (initialization vector).
 
@@ -9,9 +9,9 @@ Simply put, the padding oracle attack (or oracle padding attack) is an attack on
 
 Diagram of the CBC decryption operation.
 
-There are numerous types of padding Oracle attack, however this project focusses on the AES CBC encryption.
+There are numerous types of padding oracle attack, however this project focusses on the AES CBC encryption.
 
-The requirements for a padding oracle attack are simple. The attacker must have access to an Oracle (a server) which freely responds to incoming messages, and will confirm whether or not a message is correctly padded. This in itself tells the attacker something. Additionally, the nature of CBC means that an attacker can expose the details of block n, by manipulating block n-1. The second requirement is having a ciphertext produced **by the oracle being attacked**.
+The requirements for a padding oracle attack are simple. The attacker must have access to an oracle (a server) which freely responds to incoming messages, and will confirm whether or not a message is correctly padded. This in itself tells the attacker something. Additionally, the nature of CBC means that an attacker can expose the details of block n, by manipulating block n-1. The second requirement is having a ciphertext produced **by the oracle being attacked**.
 
 ## What is a pad?
 
@@ -51,7 +51,7 @@ In our working example, the ciphertext is 3*16 bytes long: IV+C1+C2 so
     C1 = cb20bbc7e34c16603060427d7c77ca31
     C2 = bd5c9b3024d82c1a85ee58ef256975db
 
-We can pass any ciphertext to the Oracle and find out whether it has valid padding or not, we can exploit this  by crafting a payload C1' (spoken as C1 prime) and pre pending it to C2 from our stolen ciphertext. AES block size is 16 and so to crack byte 16 we should begin by generating random bytes for C1'[1..15], and then set C1'[16] to be 00. We then concatenate C1'+C2 and send that at the Oracle. If it is valid  pad then the plaintext of C2[16] should be 01. Why? Because we are forcing the plaintext of C1' (P2') to have one byte of badding, which must be padded as 01:
+We can pass any ciphertext to the oracle and find out whether it has valid padding or not, we can exploit this  by crafting a payload C1' (spoken as C1 prime) and pre pending it to C2 from our stolen ciphertext. AES block size is 16 and so to crack byte 16 we should begin by generating random bytes for C1'[1..15], and then set C1'[16] to be 00. We then concatenate C1'+C2 and send that at the oracle. If it is valid  pad then the plaintext of C2[16] should be 01. Why? Because we are forcing the plaintext of C1' (P2') to have one byte of badding, which must be padded as 01:
 
 If 00 had been valid ciphertext then we could calculate the intermediary value like this
 
@@ -64,7 +64,7 @@ then
     I1     = 00     ^ 01   
     I2     = 01 
 
-If the Oracle tells us our ciphertext is invalid we can change the value of C1'[16] to 01, 02 etc until we get valid ciphertext. In the poc code on [GitHub][https://github.com/sharkmoos/paddingOracle/] we got valid padding for 33 (spoken as three three not 33, it is in hex). So lets put that into our formula!
+If the oracle tells us our ciphertext is invalid we can change the value of C1'[16] to 01, 02 etc until we get valid ciphertext. In the poc code on [GitHub][https://github.com/sharkmoos/paddingOracle/] we got valid padding for 33 (spoken as three three not 33, it is in hex). So lets put that into our formula!
 
     I2     = 0x51     ^ 01
     I2     = 0x33
@@ -80,7 +80,7 @@ So we now know the final byte of the intermediate state when the plaintext is ha
            = 0x2  # hex
            = 2    # decimal
 
-So we know that the last byte of our plaintext is 02 - this also suggests that the padding length is 02. If you've been following along doing it with your own code or Oracle, you probably felt like this was a lot of work. This highlights the need for automation.
+So we know that the last byte of our plaintext is 02 - this also suggests that the padding length is 02. If you've been following along doing it with your own code or oracle, you probably felt like this was a lot of work. This highlights the need for automation.
 
 ## Repeat the process.
 
@@ -107,7 +107,7 @@ Whilst this may seem a little underwhelming whe you see the trend, it is also us
 
 ## Rinse and repeat
 
-This process can be repeated 16 times as this is the number of bytes in block C2. We would generate random characters for C1'[1..13], C1'[14] == 00 and set C1'[15] and C1'[16] so that P2'[15] and P2'[16] both equal 03. And fuzz the Oracle to find out what C1'[14] must be for it to == 03, and then use it calculate the real plaintext P2[14]. This will work on all block, no matter the length, except block 1. Block one is essentially uncrackable because it was encrypted using the IV which would be unknown to the attacker.
+This process can be repeated 16 times as this is the number of bytes in block C2. We would generate random characters for C1'[1..13], C1'[14] == 00 and set C1'[15] and C1'[16] so that P2'[15] and P2'[16] both equal 03. And fuzz the oracle to find out what C1'[14] must be for it to == 03, and then use it calculate the real plaintext P2[14]. This will work on all block, no matter the length, except block 1. Block one is essentially uncrackable because it was encrypted using the IV which would be unknown to the attacker.
 
 I wrote a program to automate this entire process which you can find [here](https://github.com/sharkmoos/paddingOracle/blob/main/automated.py). It uses connects to the server via a socket and interacts fuzzes the entire block, outputting the plaintext. It should be easy to rework too depending on the task.
 

@@ -109,6 +109,6 @@ Whilst this may seem a little underwhelming whe you see the trend, it is also us
 
 This process can be repeated 16 times as this is the number of bytes in block C2. We would generate random characters for C1'[1..13], C1'[14] == 00 and set C1'[15] and C1'[16] so that P2'[15] and P2'[16] both equal 03. And fuzz the Oracle to find out what C1'[14] must be for it to == 03, and then use it calculate the real plaintext P2[14]. This will work on all block, no matter the length, except block 1. Block one is essentially uncrackable because it was encrypted using the IV which would be unknown to the attacker.
 
-I wrote a program to automate this entire process which you can find [here][https://github.com/sharkmoos/paddingOracle/blob/main/automated.py]. It uses connects to the server via a socket and interacts fully. It should be easy to rework too depending on the task.
+I wrote a program to automate this entire process which you can find [here](https://github.com/sharkmoos/paddingOracle/blob/main/automated.py). It uses connects to the server via a socket and interacts fuzzes the entire block, outputting the plaintext. It should be easy to rework too depending on the task.
 
 This is a good demonstration of why security through obscurity is effective - if the attacker couldn't test whether padding was valid, this attack would fail before it began. I hope you enjoyed reading this article, or failing that found it useful. 

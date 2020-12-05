@@ -36,7 +36,7 @@ if __name__ == "__main__":
     print(p.recvuntil(b'2. Send your encrypted message.\n'))
     p.sendline(b"1")
     cipher = (p.recvline()).decode("utf-8")
-    print("Beginning Attack...")
+    print("\nBeginning Attack...\n")
     c = [cipher[i:i+32] for i in range(0, len(cipher), 32)]
     iv = c[0]
     oc1 = c[1]

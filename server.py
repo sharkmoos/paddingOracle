@@ -10,10 +10,8 @@ flag = b"The flag is HTB{Well_done_you}"
 KEY_LENGTH = 16
 BLOCK_SIZE = AES.block_size
 
-#key = os.urandom(KEY_LENGTH)
+key = os.urandom(KEY_LENGTH)
 
-key = b"qwertyuiopasdfgh" # New key for testing
-iv  = b"zxcvbnmlkjhgfdsa" # New IV for testing
 def add_padding(msg):
 	pad_len = BLOCK_SIZE - (len(msg) % BLOCK_SIZE)
 	padding = bytes([pad_len]) * pad_len
@@ -29,7 +27,7 @@ def remove_padding(data):
 	return data[:-pad_len]
 
 def encrypt(msg):
-	#iv = os.urandom(BLOCK_SIZE)
+	iv = os.urandom(BLOCK_SIZE)
 	print(iv.hex)
 	cipher = AES.new(key, AES.MODE_CBC, iv)
 	return (iv + cipher.encrypt(add_padding(msg))).hex()
